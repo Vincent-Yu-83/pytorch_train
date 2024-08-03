@@ -1,10 +1,11 @@
+# <p align="center">Pytorch Train</p>
 
 pytorch单精度、半精度、混合精度、单卡、多卡（DP / DDP）、FSDP、DeepSpeed模型训练、模型保存、模型推理、onnx导出、onnxruntime推理等示例代码，并对比不同方法的训练速度以及GPU内存的使用。
 
----
 
+<br/>
 
-### **训练环境设置**
+## **训练环境设置**
 * 模型：预训练的Resnet50
 * 数据集：Cifar10
 * 硬件资源：一台4卡Tesla P40
@@ -16,15 +17,15 @@ pytorch单精度、半精度、混合精度、单卡、多卡（DP / DDP）、FS
 响
 2. ResNet50模型较小，batch_size=1时单卡仅占用 0.34G显存，绝大部分显存都被输入数据，以及中间激活占用
 
----
+<br/>
 
-### **测试基准（batch_size=1）**
+## **测试基准（batch_size=1）**
 * 单卡显存占用：0.34 G
 * 单卡GPU使用率峰值：60%
 
----
+<br/>
 
-### **单卡单精度训练**
+## **单卡单精度训练**
 * 代码文件：pytorch_SingleGPU.py
 * 单卡显存占用：11.24 G
 * 单卡GPU使用率峰值：100%
@@ -33,9 +34,9 @@ pytorch单精度、半精度、混合精度、单卡、多卡（DP / DDP）、FS
 
 ![](./results/pytorch_SingleGPU.jpg)
 
----
+<br/>
 
-### **单卡半精度训练**
+## **单卡半精度训练**
 * 代码文件：pytorch_half_precision.py
 * 单卡显存占用：5.79 G
 * 单卡GPU使用率峰值：100%
@@ -46,9 +47,9 @@ pytorch单精度、半精度、混合精度、单卡、多卡（DP / DDP）、FS
 
 **备注：** 单卡半精度训练的准确率只有75%，单精度的准确率在85%左右
 
----
+<br/>
 
-### **单卡混合精度训练**
+## **单卡混合精度训练**
 
 [AUTOMATIC MIXED PRECISION PACKAGE - TORCH.AMP](https://pytorch.org/docs/stable/amp.html#torch.autocast)
 
@@ -167,9 +168,9 @@ with torch.autocast(device_type="cuda"):
     g_float16 = torch.mm(d_float32, f_float32)
 ```
 
----
+<br/>
 
-### **4卡 DP（Data Parallel）**
+## **4卡 DP（Data Parallel）**
 * 代码文件：pytorch_DP.py
 * 单卡显存占用：3.08 G
 * 单卡GPU使用率峰值：99%
@@ -178,9 +179,9 @@ with torch.autocast(device_type="cuda"):
 
 ![](./results/pytorch_DP.jpg)
 
----
+<br/>
 
-### **4卡 DDP（Distributed Data Parallel）**
+## **4卡 DDP（Distributed Data Parallel）**
 
 [DISTRIBUTED COMMUNICATION PACKAGE - TORCH.DISTRIBUTED](https://pytorch.org/docs/stable/distributed.html)
 
@@ -210,9 +211,9 @@ python -m torch.distributed.launch --nproc_per_node=4 --nnodes=1 pytorch_DDP.py
 torchrun --nproc_per_node=4 --nnodes=1 pytorch_torchrun_DDP.py    
 ```
 
----
+<br/>
 
-### **基于accelerate的 DDP**
+## **基于accelerate的 DDP**
 
 [huggingface/accelerate](https://github.com/huggingface/accelerate)
 
@@ -250,9 +251,9 @@ use_cpu: false
 accelerate launch --config_file ./config/default_DDP.yml accelerate_DDP.py    
 ```
 
----
+<br/>
 
-### **Pytorch + FSDP（Fully Sharded Data Parallel）**
+## **Pytorch + FSDP（Fully Sharded Data Parallel）**
 
 [Pytorch FULLY SHARDED DATA PARALLEL (FSDP) 初识](https://zhuanlan.zhihu.com/p/620333654)
 
@@ -300,9 +301,9 @@ torchrun --nproc_per_node=4 --nnodes=1 pytorch_torchrun_FSDP.py
 
 ![](./results/FSDP_model.png)
 
----
+<br/>
 
-### **基于accelerate的 FSDP（Fully Sharded Data Parallel）**
+## **基于accelerate的 FSDP（Fully Sharded Data Parallel）**
 * batch_size == 1
     * 单卡显存占用：0.38 G，相比基准测试的 0.34G 并没有减少
     * 单卡GPU使用率峰值：60%
@@ -350,9 +351,9 @@ use_cpu: false
 accelerate launch --config_file ./config/default_FSDP.yml accelerate_FSDP.py    
 ```
 
----
+<br/>
 
-### **Pytorch + DDP + ZeRO（Zero Redundancy Optimizer）**
+## **Pytorch + DDP + ZeRO（Zero Redundancy Optimizer）**
 
 * 代码文件：pytorch_DDP_ZeRO.py
 * 单卡显存占用：3.18 G
@@ -369,9 +370,9 @@ python -m torch.distributed.launch --nproc_per_node=4 --nnodes=1 pytorch_DDP_ZeR
 
 ```
 
----
+<br/>
 
-### **Pytorch + DeepSpeed**
+## **Pytorch + DeepSpeed**
 
 [[BUG] error: unrecognized arguments: --deepspeed ./ds_config.json #3961](https://github.com/microsoft/DeepSpeed/issues/3961)
 
@@ -392,9 +393,9 @@ python -m torch.distributed.launch --nproc_per_node=4 --nnodes=1 pytorch_DDP_ZeR
 deepspeed pytorch_DeepSpeed.py --deepspeed_config ./config/zero_stage2_config.json    
 ```
 
----
+<br/>
 
-### **基于accelerate的 DeepSpeed**
+## **基于accelerate的 DeepSpeed**
 
 [DeepSpeed介绍](https://zhuanlan.zhihu.com/p/624412809)
 
@@ -408,9 +409,9 @@ deepspeed pytorch_DeepSpeed.py --deepspeed_config ./config/zero_stage2_config.js
 * 训练时长（5 epoch）：
 * 训练结果：
 
----
+<br/>
 
-### **模型保存**
+## **模型保存**
 
 详见各方法的训练代码文件。
 
@@ -431,15 +432,15 @@ states = model.state_dict()
         torch.save(states, model_name)
 ```
 
----
+<br/>
 
-### **模型推理**
+## **模型推理**
 
 详见model_inference.py代码文件
 
----
+<br/>
 
-### **onnx模型导出 / onnxruntime推理**
+## **onnx模型导出 / onnxruntime推理**
 
 [pytorch.onnx.export方法参数详解，以及onnxruntime-gpu推理性能测试](https://blog.csdn.net/cxx654/article/details/123011332)
 
