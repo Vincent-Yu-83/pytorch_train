@@ -3,13 +3,6 @@ pytorch单精度、半精度、混合精度、单卡、多卡（DP / DDP）、FS
 
 ---
 
-### **FairScale（你真的需要FSDP、DeepSpeed吗？）**
-
-在了解各种训练方式之前，先来看一下 FairScale 给出的一个模型训练方式选择的流程，选择适合自己的方式，就是最好的。
-
-![](./results/FairScale.png)
-
----
 
 ### **训练环境设置**
 * 模型：预训练的Resnet50
@@ -451,9 +444,3 @@ states = model.state_dict()
 [pytorch.onnx.export方法参数详解，以及onnxruntime-gpu推理性能测试](https://blog.csdn.net/cxx654/article/details/123011332)
 
 详见model_inference.py代码文件
-
-
-<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({ tex2jax: {inlineMath: [['$', '$']]}, messageStyle: "none" });
-</script>
