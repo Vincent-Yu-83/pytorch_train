@@ -80,6 +80,13 @@ def onnx_inference(model_path):
                                            ])
     # session = onnxruntime.InferenceSession(model_path)
     data = np.random.randn(2, 3, 224, 224).astype(np.float32)
+    X_ortvalue = onnxruntime.OrtValue.ortvalue_from_numpy(data,'cuda',0)
+    print("ortvalue device:",X_ortvalue.device_name())  # 获取ortvalue对象所在的设备名称
+    print("ortvalue data type:",X_ortvalue.data_type())  # 获取ortvalue对象的数据类型
+    print("ortvalue shape:",X_ortvalue.shape())  # 获取ortvalue对象的形状
+    print("if ortvalue is tensor:",X_ortvalue.is_tensor())  # 判断ortvalue对象是否是tensor对象
+    print(np.array_equal(X_ortvalue.numpy(), data))  # 判断ortvalue对象的数据是否与numpy数组相等
+
 
     # 获取模型原始输入的字段名称
     input_name = session.get_inputs()[0].name
@@ -88,12 +95,47 @@ def onnx_inference(model_path):
 
     # 以字典方式将数据输入到模型中
     outputs = session.run([output_name], {input_name: data})
-    print(outputs)
+    print('outputs: ', outputs)
+    
+    '''
+    绑定输入输出，通过io_binding来进行推理。
+    绑定时需要设置好输入输出的shape，否则会报错，输出的绑定可以不用管，onnxruntime会自动进行推测输出的shape并在设备上分配内存给输出。
+
+    个人理解这种io_binding做法的好处就是固定好输入输出的内存地址，避免不断allocated和free的过程，更加高效。有点像设计模式中的单例模式。
+    '''
+    io_binding = session.io_binding() # 创建io_binding对象
+    io_binding.bind_input(input_name,
+                        device_type=X_ortvalue.device_name(),
+                        device_id=0,
+                        element_type=np.float32,
+                        shape=X_ortvalue.shape(),
+                        buffer_ptr=X_ortvalue.data_ptr()) # 绑定模型的输入
+    # buffer_ptr参数为tensor对象的数据指针，可以通过tensor对象的data_ptr方法获取
+    io_binding.bind_output(output_name) # 绑定模型的输出
+    #onnxruntime可以为output动态分配内存，也可以通过bind_output方法指定output的形状和数据类型
+    session.run_with_iobinding(io_binding) # 使用io_binding方法进行模型推理
+
+    Y = io_binding.copy_outputs_to_cpu()[0] # 将模型的输出从GPU上拷贝到CPU上
+    print("Y shape:", Y.shape)
+    
+    #onnxruntime io_binding方法可以提高模型推理的效率，特别是在模型的输入和输出形状不变的情况下
+    #onnxruntime io_binding还可以绑定到pytorch的tensor对象上，可以通过pytorch的tensor对象的data_ptr方法获取数据指针
+    Y_tensor = torch.zeros(2,1000).cuda()
+    io_binding.bind_output(
+        output_name,
+        device_type=Y_tensor.device.type,
+        device_id=Y_tensor.device.index,
+        element_type=np.float32,
+        shape=Y_tensor.shape,
+        buffer_ptr=Y_tensor.data_ptr())
+    session.run_with_iobinding(io_binding)
+    print("Y_tensor shape:", Y_tensor.shape)
+
 
 
 if __name__ == '__main__':
-    model_path = pytorch_2_onnx("results/pytorch_SingleGPU/pytorch_SingleGPU-4-0.8502.pth", "results/pytorch_SingleGPU/pytorch_SingleGPU.onnx")
+    model_path = pytorch_2_onnx("results/pytorch_SingleGPU/pytorch_SingleGPU-4-0.8491.pth", "results/pytorch_SingleGPU/pytorch_SingleGPU.onnx")
 
-    onnx_check(model_path)
+    # onnx_check(model_path)
 
     onnx_inference(model_path)

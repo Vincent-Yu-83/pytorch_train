@@ -24,6 +24,7 @@ def predict(model_path, classes, device=None, is_half=None, is_amp=None):
         model = model.half()
     model.eval()
 
+    # 帧率计数器开始
     fps_speed = fps.FPS()
     fps_speed.start()
 
@@ -51,10 +52,12 @@ def predict(model_path, classes, device=None, is_half=None, is_amp=None):
 
             print("true label: {}, pred label: {}, probability: {}".format(classes[y.item()], pred_cls, pred_prob))
 
+            # 帧率计数器更新
             fps_speed.update()
 
             if batch_idx > 10:
                 break
+    # 停止计算帧率
     fps_speed.stop()
     print("FPS: {}".format(fps_speed.fps()))
     print("time: {}".format(fps_speed.elapsed()))
@@ -77,16 +80,16 @@ if __name__ == '__main__':
     classes = cifar10_test.classes
 
     model_args = [
-        {"model_path": "results/pytorch_SingleGPU/pytorch_SingleGPU-4-0.8502.pth", "is_half": None, "is_amp": None},
-        {"model_path": "results/pytorch_half_precision/pytorch_half_precision-3-0.7657.pth", "is_half": True, "is_amp": None},
-        {"model_path": "results/pytorch_auto_mixed_precision/pytorch_auto_mixed_precision-4-0.8527.pth", "is_half": None, "is_amp": True},
-        {"model_path": "results/pytorch_DP/pytorch_DP-4-0.853.pth", "is_half": None, "is_amp": None},
-        {"model_path": "results/pytorch_DDP/pytorch_DDP-4-0.8498.pth", "is_half": None, "is_amp": None},
-        {"model_path": "results/pytorch_torchrun_DDP/pytorch_torchrun_DDP-4-0.8535.pth", "is_half": None, "is_amp": None},
-        {"model_path": "results/accelerate_DDP/accelerate_DDP-4-0.8429588607594937.pth", "is_half": None, "is_amp": None},
-        {"model_path": "results/pytorch_FSDP/pytorch_FSDP-4-0.854.pth", "is_half": None, "is_amp": None},
-        {"model_path": "results/pytorch_torchrun_FSDP/pytorch_torchrun_FSDP-3-0.8445.pth", "is_half": None, "is_amp": None},
-        {"model_path": "results/accelerate_FSDP/accelerate_FSDP-4-0.8551226265822784.pth", "is_half": None, "is_amp": None},
+        {"model_path": "results/pytorch_SingleGPU/pytorch_SingleGPU-4-0.8491.pth", "is_half": None, "is_amp": None},
+        # {"model_path": "results/pytorch_half_precision/pytorch_half_precision-3-0.7657.pth", "is_half": True, "is_amp": None},
+        # {"model_path": "results/pytorch_auto_mixed_precision/pytorch_auto_mixed_precision-4-0.8527.pth", "is_half": None, "is_amp": True},
+        # {"model_path": "results/pytorch_DP/pytorch_DP-4-0.853.pth", "is_half": None, "is_amp": None},
+        # {"model_path": "results/pytorch_DDP/pytorch_DDP-4-0.8498.pth", "is_half": None, "is_amp": None},
+        # {"model_path": "results/pytorch_torchrun_DDP/pytorch_torchrun_DDP-4-0.8535.pth", "is_half": None, "is_amp": None},
+        # {"model_path": "results/accelerate_DDP/accelerate_DDP-4-0.8429588607594937.pth", "is_half": None, "is_amp": None},
+        # {"model_path": "results/pytorch_FSDP/pytorch_FSDP-4-0.854.pth", "is_half": None, "is_amp": None},
+        # {"model_path": "results/pytorch_torchrun_FSDP/pytorch_torchrun_FSDP-3-0.8445.pth", "is_half": None, "is_amp": None},
+        # {"model_path": "results/accelerate_FSDP/accelerate_FSDP-4-0.8551226265822784.pth", "is_half": None, "is_amp": None},
     ]
     for model_info in model_args:
         predict(**model_info, classes=classes, device=device)
